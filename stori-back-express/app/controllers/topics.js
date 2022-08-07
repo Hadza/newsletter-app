@@ -26,7 +26,7 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   // Find all topics
   Topic.findAll({
-    attributes: ["id", "name"],
+    attributes: ["id", "name", "createdAt", "updatedAt"],
   })
     .then((data) => {
       res.send(data);

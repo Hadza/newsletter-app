@@ -17,8 +17,8 @@ const quasarUserOptions = {
 
 const pinia = createPinia();
 const app = createApp(App)
-  .use(Quasar, quasarUserOptions)
   .use(pinia)
+  .use(Quasar, quasarUserOptions)
   .use(router);
 
 app.mount("#app");

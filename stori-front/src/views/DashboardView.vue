@@ -22,7 +22,7 @@
           <q-card flat square bordered class="col-4 stats-card">
             <q-card-section>
               <div class="text-h6 text-weight-light">Total Topics</div>
-              <div class="text-h4 text-weight-light">{{ totalTopics }}</div>
+              <div class="text-h4 text-weight-light">{{ rows.length }}</div>
             </q-card-section>
           </q-card>
         </q-card-section>
@@ -57,21 +57,44 @@
 
 <script>
 import { defineComponent } from "vue";
+import { ref } from "vue";
 import TopicsService from "@/services/TopicsService";
+import { date } from "quasar";
 
-const rows = [];
 const columns = [
   {
     name: "id",
+    field: "id",
     label: "ID",
     align: "right",
     width: "100px",
   },
   {
     name: "name",
+    field: "name",
     label: "Name",
     align: "left",
     width: "200px",
+  },
+  {
+    name: "created_at",
+    field: "createdAt",
+    label: "Created At",
+    align: "left",
+    width: "200px",
+    format: (value) => {
+      return date.formatDate(value, "DD-MM-YYYY");
+    },
+  },
+  {
+    name: "updated_at",
+    field: "updatedAt",
+    label: "Updated At",
+    align: "left",
+    width: "200px",
+    format: (value) => {
+      return date.formatDate(value, "DD-MM-YYYY");
+    },
   },
 ];
 
@@ -79,6 +102,8 @@ export default defineComponent({
   name: "DashboardView",
   components: {},
   setup() {
+    const rows = ref([]);
+
     return {
       totalUsers: 15,
       rows,
@@ -99,11 +124,6 @@ export default defineComponent({
       }).then(() => {
         this.fetchTopics();
       });
-    },
-  },
-  computed: {
-    totalTopics() {
-      return this.rows.length;
     },
   },
   mounted() {
