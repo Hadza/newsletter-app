@@ -8,6 +8,7 @@ const db = require("./app/models");
 const indexRouter = require("./app/routes/index");
 const usersRouter = require("./app/routes/users");
 const topicsRouter = require("./app/routes/topics");
+const newslettersRouter = require("./app/routes/newsletters");
 
 const app = express();
 const corsOptions = {
@@ -27,7 +28,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/topics", topicsRouter);
+app.use("/api/newsletters", newslettersRouter);
 
 module.exports = app;

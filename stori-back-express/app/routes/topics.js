@@ -5,6 +5,10 @@ const topics = require("../controllers/topics.js");
 /* GET topics listing. */
 router.get("/", topics.findAll);
 
+/* GET topics count. */
+
+router.get("/count", topics.count);
+
 /* GET topic by id. */
 router.get("/:id", topics.findOne);
 

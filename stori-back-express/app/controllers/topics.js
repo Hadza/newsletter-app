@@ -38,6 +38,19 @@ exports.findAll = (req, res) => {
     });
 };
 
+exports.count = (req, res) => {
+  // Count all topics
+  Topic.count()
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while finding the Topics.",
+      });
+    });
+};
+
 exports.findOne = (req, res) => {
   if (!req.params.id) {
     res.status(400).send({
