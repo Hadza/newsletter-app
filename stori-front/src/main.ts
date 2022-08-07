@@ -3,15 +3,22 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
+import { Quasar } from "quasar";
+import "./styles/quasar.scss";
+import "@quasar/extras/roboto-font/roboto-font.css";
+import "@quasar/extras/material-icons/material-icons.css";
 
-import BalmUI from "balm-ui"; // Official Google Material Components
-
-import "balm-ui-css";
+const quasarUserOptions = {
+  config: {
+    supportTS: true,
+  },
+  plugins: {},
+};
 
 const pinia = createPinia();
-const app = createApp(App);
+const app = createApp(App)
+  .use(Quasar, quasarUserOptions)
+  .use(pinia)
+  .use(router);
 
-app.use(pinia);
-app.use(BalmUI);
-app.use(router);
 app.mount("#app");
