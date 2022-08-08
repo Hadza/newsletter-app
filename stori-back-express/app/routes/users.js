@@ -19,6 +19,9 @@ router.delete("/:id/subscriptions", users.deleteSubscription);
 /* POST user. */
 router.post("/", users.create);
 
+/* POST users. */
+router.post("/bulk", users.createUsers);
+
 /* GET users count. */
 
 module.exports = router;

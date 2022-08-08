@@ -3,7 +3,6 @@
     <q-card-section>
       <div class="text-h6">Summary</div>
     </q-card-section>
-
     <q-card-section class="flex justify-around gap">
       <dashboard-stat-card
         title="Total Subscribers"
@@ -35,10 +34,6 @@ export default {
     const newslettersStore = useNewslettersStore();
     const topicsStore = useTopicsStore();
     const usersStore = useUsersStore();
-
-    console.log("newslettersStore", newslettersStore);
-    console.log("topicsStore", topicsStore);
-    console.log("usersStore", usersStore);
 
     const { getNewslettersCount } = storeToRefs(newslettersStore);
     const { getTopicsCount } = storeToRefs(topicsStore);

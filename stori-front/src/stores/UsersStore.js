@@ -18,5 +18,25 @@ export const useUsersStore = defineStore("users", {
           console.log(err);
         });
     },
+    // create user
+    createUser(user) {
+      UsersService.create(user)
+        .then((data) => {
+          this.getAll();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    // create users by bulk
+    createUsers(users) {
+      UsersService.createUsers(users)
+        .then((data) => {
+          this.getAll();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 });

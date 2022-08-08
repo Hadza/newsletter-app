@@ -2,37 +2,75 @@ const db = require("../models");
 const Newsletter = db.newsletter;
 const Op = db.Sequelize.Op;
 
-exports.create = (req, res) => {
-  if (!req.body.topic_id) {
+exports.create = async (req, res) => {
+  if (!req.body.topic) {
     res.status(400).send({
       message: "Content can not be empty!",
     });
     return;
   }
 
-  // Create a new newsletter
-  Newsletter.create({
-    topic_id: req.body.topic_id,
-    content_url: req.body.content_url,
-    status: req.body.status,
-    title: req.body.title,
-  })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Newsletter.",
+  let { content, topic, status, users, title, send, file, newTopic } = req.body;
+  let newTopicData = {};
+
+  console.log(users);
+  let parsedUsers = users.map((user) => {
+    return {
+      ...user,
+      subscription: {
+        active: true,
+      },
+    };
+  });
+  console.log(parsedUsers);
+  if (newTopic) {
+    topic = await db.topics
+      .create(
+        {
+          name: topic,
+          users: parsedUsers,
+          newsletters: [
+            {
+              title,
+              content_url: "",
+              status,
+            },
+          ],
+        },
+        {
+          include: [
+            { model: db.users, as: "users", ignoreDuplicates: true },
+            { model: db.newsletter },
+          ],
+        }
+      )
+      .catch((err) => {
+        console.log(err);
       });
+  } else {
+    topic = await db.topics.findByPk(topic.id).then((data) => {
+      data.data.users = parsedUsers;
+      data.data.newsletters = [
+        {
+          title,
+          content_url: "",
+          status,
+        },
+      ];
+      return data;
     });
+  }
+
+  res.sendStatus(200);
+
+  // Create a new newsletter
 };
 
 exports.findAll = (req, res) => {
   // Find all newsletters sorted by createdAt desc
   Newsletter.findAll({
     order: [["createdAt", "DESC"]],
-    include: "Topic",
+    include: "topic",
   })
     .then((data) => {
       console.log(data);

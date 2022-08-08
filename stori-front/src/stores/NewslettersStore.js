@@ -18,5 +18,15 @@ export const useNewslettersStore = defineStore("newsletters", {
           console.log(err);
         });
     },
+    // create newsletter
+    createNewsletter(newsletter) {
+      NewslettersService.create(newsletter)
+        .then((data) => {
+          this.getAll();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 });

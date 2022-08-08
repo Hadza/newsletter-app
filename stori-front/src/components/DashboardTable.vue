@@ -10,7 +10,6 @@
           unelevated
           label="New Newsletter"
           class="align-self-center"
-          ripple="false"
           @click="addRecord"
         >
           <template v-slot:default>
@@ -47,7 +46,7 @@ export default {
       },
       {
         name: "topic",
-        field: (row) => row.Topic.name,
+        field: (row) => row.topic.name,
         label: "Topic",
         align: "left",
         width: "200px",
@@ -73,7 +72,6 @@ export default {
   },
   methods: {
     addRecord() {
-      console.log("addRecord");
       this.$emit("changeView");
     },
   },

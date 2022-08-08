@@ -13,6 +13,10 @@ class UsersService {
     return http.post("/users", user);
   }
 
+  createUsers(users) {
+    return http.post("/users/bulk", users);
+  }
+
   update(id, user) {
     return http.put(`/users/${id}`, user);
   }

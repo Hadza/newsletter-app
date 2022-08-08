@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const Newsletter = sequelize.define("Newsletter", {
+  const Newsletter = sequelize.define("newsletter", {
     status: {
       type: DataTypes.STRING,
       defaultValue: "draft",

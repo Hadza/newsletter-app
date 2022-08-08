@@ -18,5 +18,12 @@ export const useTopicsStore = defineStore("topics", {
           console.log(err);
         });
     },
+    // create topic
+    async createTopic(topic) {
+      console.log("topic", topic);
+      return await TopicsService.create(topic).catch((err) => {
+        console.log(err);
+      });
+    },
   },
 });

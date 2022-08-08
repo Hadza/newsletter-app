@@ -25,6 +25,27 @@ exports.create = (req, res) => {
     });
 };
 
+// create users by bulk
+exports.createUsers = (req, res) => {
+  if (!req.body.users) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+    return;
+  }
+
+  // Create a new user
+  User.bulkCreate(req.body.users, { ignoreDuplicates: true })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while creating the User.",
+      });
+    });
+};
+
 exports.findAll = (req, res) => {
   // Find all users
   User.findAll()
