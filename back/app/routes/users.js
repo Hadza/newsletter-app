@@ -7,6 +7,9 @@ router.get("/", users.findAll);
 /* GET users listing by topic */
 router.get("/:topic_id", users.findAllByTopic);
 
+/* GET user by email */
+router.get("/email/:email", users.findByEmail);
+
 /* GET users count. */
 router.get("/count", users.count);
 

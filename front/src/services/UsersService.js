@@ -9,6 +9,10 @@ class UsersService {
     return http.get(`/users/${id}`);
   }
 
+  // get user by email
+  findByEmail(email) {
+    return http.get(`/users/email/${email}`);
+  }
   create(user) {
     return http.post("/users", user);
   }

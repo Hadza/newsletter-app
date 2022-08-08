@@ -7,10 +7,17 @@ export const useUsersStore = defineStore("users", {
   }),
   getters: {
     getUsersCount: (state) => state.users.length,
+    getUsersByTopic: (state) => (topic_id) => {
+      return state.users.filter((user) => {
+        return user.topics.some((topic) => {
+          return topic.id === topic_id;
+        });
+      });
+    },
   },
   actions: {
     getAll() {
-      UsersService.getAll()
+      return UsersService.getAll()
         .then((data) => {
           this.users = data.data;
         })
@@ -20,7 +27,7 @@ export const useUsersStore = defineStore("users", {
     },
     // create user
     createUser(user) {
-      UsersService.create(user)
+      return UsersService.create(user)
         .then((data) => {
           this.getAll();
         })
@@ -30,7 +37,7 @@ export const useUsersStore = defineStore("users", {
     },
     // create users by bulk
     createUsers(users) {
-      UsersService.createUsers(users)
+      return UsersService.createUsers(users)
         .then((data) => {
           this.getAll();
         })

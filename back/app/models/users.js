@@ -4,12 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       email: {
         type: DataTypes.STRING,
-        primaryKey: true,
       },
-      name: {
-        type: DataTypes.STRING,
-      },
-    }
+    },
     // {
     //   indexes: [
     //     {

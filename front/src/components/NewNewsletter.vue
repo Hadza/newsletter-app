@@ -6,6 +6,7 @@
       <template v-if="!newTopic">
         <q-select
           v-model="topic"
+          @update:model-value="changeTopic"
           :options="options"
           label="Topic"
           class="q-mb-sm"
@@ -54,63 +55,51 @@
         </template>
       </q-file>
     </q-card-section>
-    <q-separator />
     <q-card-section>
       <h6 class="text-weight-regular q-my-auto">Subscribers</h6>
-      <q-table :rows="users" :columns="columns" class="table q-px-none">
-        <template v-if="toggleNewUser" v-slot:top>
-          <div class="flex column justify-start">
-            <h6 class="col-6 text-body1 q-my-none text-weight-regular">
-              New subscriber
-            </h6>
-            <q-btn
-              color="gray"
-              size="md"
-              square
-              text-color="black"
-              unelevated
-              label="Add"
-              class="align-self-center col-6"
-              @click="toggleNewUser = !toggleNewUser"
-            >
-              <template v-slot:default>
-                <q-icon class="q-mx-sm" name="add" />
-              </template>
-            </q-btn>
-          </div>
-          <q-input
-            dense
-            v-model="user.name"
-            label="name"
-            class="q-mb-sm"
-            size="sm"
-          >
-          </q-input>
-          <q-space class="col-6"></q-space>
-          <q-input
-            dense
-            v-model="user.email"
-            label="email"
-            class="q-mb-sm"
-            size="sm"
-          >
-          </q-input>
-        </template>
-        <template v-else v-slot:top-right>
+      <q-table
+        :rows="users"
+        :columns="columns"
+        class="table q-px-none"
+        row-key="email"
+      >
+        <template v-slot:top-right>
           <q-btn
             color="gray"
             size="md"
-            square
             text-color="black"
             unelevated
             label="Add"
-            class="align-self-center"
-            @click="toggleNewUser = !toggleNewUser"
+            class="align-self-center col-auto"
+            @click="addEmailList"
           >
             <template v-slot:default>
               <q-icon class="q-mx-sm" name="add" />
             </template>
           </q-btn>
+        </template>
+        <template v-slot:top-left>
+          <q-input
+            dense
+            v-model="emailList"
+            label="Email list"
+            hint="Separate emails with a comma"
+            class="q-mb-sm col-auto email-list"
+            size="sm"
+          >
+          </q-input>
+        </template>
+        <template v-slot:body-cell-action="props">
+          <q-td :props="props">
+            <q-btn
+              color="negative"
+              icon-right="delete"
+              no-caps
+              flat
+              dense
+              @click="deleteItem(props.row)"
+            />
+          </q-td>
         </template>
       </q-table>
     </q-card-section>
@@ -152,12 +141,14 @@ import { useUsersStore } from "@/stores/UsersStore";
 import { useTopicsStore } from "@/stores/TopicsStore";
 import { useNewslettersStore } from "@/stores/NewslettersStore";
 import { ref } from "vue";
+import UsersService from "@/services/UsersService";
 
 export default {
   name: "NewNewsletter",
   setup() {
     const { topics } = storeToRefs(useTopicsStore());
     const users = ref([]);
+    const emailList = ref("");
     const user = ref({ name: "", email: "" });
     const title = ref("");
     const topic = ref("");
@@ -166,14 +157,14 @@ export default {
     const newTopic = ref(false);
     const toggleNewUser = ref(false);
     const { createNewsletter } = useNewslettersStore();
-    const { createUsers } = useUsersStore();
+    const { createUsers, getUsersByTopic } = useUsersStore();
     const { createTopic } = useTopicsStore();
 
     const columns = [
       {
-        name: "name",
-        field: "name",
-        label: "Name",
+        name: "id",
+        field: "id",
+        label: "ID",
         align: "left",
         width: "200px",
       },
@@ -184,6 +175,7 @@ export default {
         align: "left",
         width: "200px",
       },
+      { name: "action", label: "Action", field: "action" },
     ];
 
     return {
@@ -200,6 +192,8 @@ export default {
       createUsers,
       createTopic,
       toggleNewUser,
+      getUsersByTopic,
+      emailList,
     };
   },
   methods: {
@@ -219,6 +213,42 @@ export default {
     toggleNewTopic() {
       this.topic = "";
       this.newTopic = !this.newTopic;
+    },
+    changeTopic() {
+      const { topic } = this;
+      const { getUsersByTopic } = this;
+      console.log(topic);
+      this.users = getUsersByTopic(topic.value);
+    },
+    async addEmailList() {
+      let { emailList, users } = this;
+      //   split list of emails, compare to email regex and add to users array
+      const emails = emailList.replace(/ /g, "").split(",");
+      console.log(emails);
+      emails.forEach((email) => {
+        if (email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+          let isInArray = false;
+          if (users.find((user) => user.email === email)) {
+            isInArray = true;
+          }
+          //  if email is not in array, find by email and add to users array
+          if (!isInArray) {
+            UsersService.findByEmail(email).then((user) => {
+              if (user.data.email) {
+                users.push(user.data);
+              } else {
+                users.push({ email });
+              }
+            });
+          }
+        }
+      });
+      // clean email list
+      emailList = "";
+    },
+    deleteItem(index) {
+      let { users } = this;
+      users.splice(users.indexOf(index), 1);
     },
   },
   computed: {
@@ -243,14 +273,14 @@ export default {
   min-width: 400px;
 }
 
-.q-table__top {
-  padding: 0;
-}
-
 /*table min width 320 on mobile*/
 @media (max-width: 375px) {
   .table {
     min-width: 320px;
   }
+}
+
+.email-list {
+  min-width: 280px;
 }
 </style>

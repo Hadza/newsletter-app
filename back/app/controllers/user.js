@@ -25,6 +25,31 @@ exports.create = (req, res) => {
     });
 };
 
+// find by email
+exports.findByEmail = (req, res) => {
+    if (!req.params.email) {
+        res.status(400).send({
+        message: "Content can not be empty!",
+        });
+        return;
+    }
+
+    // Find user by email
+    User.findOne({
+        where: {
+            email: req.params.email,
+        },
+    })
+        .then((data) => {
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while finding User.",
+            });
+        });
+}
+
 // create users by bulk
 exports.createUsers = (req, res) => {
   if (!req.body.users) {
@@ -48,7 +73,9 @@ exports.createUsers = (req, res) => {
 
 exports.findAll = (req, res) => {
   // Find all users
-  User.findAll()
+  User.findAll({
+      include: "topics",
+  })
     .then((data) => {
       res.send(data);
     })
