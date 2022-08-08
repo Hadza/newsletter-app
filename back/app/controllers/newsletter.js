@@ -48,17 +48,25 @@ exports.create = async (req, res) => {
         console.log(err);
       });
   } else {
-    topic = await db.topics.findByPk(topic.id).then((data) => {
-      data.data.users = parsedUsers;
-      data.data.newsletters = [
-        {
-          title,
-          content_url: "",
-          status,
-        },
-      ];
-      return data;
-    });
+    await db.topics
+      .findByPk(topic.id)
+      .then((topic) => {
+        topic.addUsers(parsedUsers).catch((err) => {
+          console.log(err);
+        });
+        topic
+          .addNewsletters({
+            title,
+            content_url: "",
+            status,
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   res.sendStatus(200);

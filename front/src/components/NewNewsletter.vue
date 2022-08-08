@@ -1,9 +1,7 @@
 <template>
   <q-card-section>
     <q-card-section>
-      <q-card-section>
-        <div class="text-h6">New</div>
-      </q-card-section>
+      <div class="text-h6 text-weight-regular">New topic</div>
       <q-input v-model="title" label="Title" class="q-mb-lg" />
       <template v-if="!newTopic">
         <q-select
@@ -13,19 +11,7 @@
           class="q-mb-sm"
         >
           <template v-slot:after>
-            <q-btn
-              color="white"
-              size="md"
-              square
-              text-color="black"
-              unelevated
-              class="align-self-center"
-              @click="toggleNewTopic"
-            >
-              <template v-slot:default>
-                <q-icon name="add" />
-              </template>
-            </q-btn>
+            <q-btn round dense flat icon="add" @click="toggleNewTopic" />
           </template>
         </q-select>
       </template>
@@ -63,20 +49,54 @@
 
         <template v-slot:hint> PNG/PDF only </template>
 
-        <template v-slot:append>
+        <template v-slot:after>
           <q-btn round dense flat icon="add" @click.stop.prevent />
         </template>
       </q-file>
     </q-card-section>
     <q-separator />
     <q-card-section>
-      <q-table
-        title="Subscribers"
-        :rows="users"
-        :columns="columns"
-        class="table"
-      >
-        <template v-slot:top-right>
+      <h6 class="text-weight-regular q-my-auto">Subscribers</h6>
+      <q-table :rows="users" :columns="columns" class="table q-px-none">
+        <template v-if="toggleNewUser" v-slot:top>
+          <div class="flex column justify-start">
+            <h6 class="col-6 text-body1 q-my-none text-weight-regular">
+              New subscriber
+            </h6>
+            <q-btn
+              color="gray"
+              size="md"
+              square
+              text-color="black"
+              unelevated
+              label="Add"
+              class="align-self-center col-6"
+              @click="toggleNewUser = !toggleNewUser"
+            >
+              <template v-slot:default>
+                <q-icon class="q-mx-sm" name="add" />
+              </template>
+            </q-btn>
+          </div>
+          <q-input
+            dense
+            v-model="user.name"
+            label="name"
+            class="q-mb-sm"
+            size="sm"
+          >
+          </q-input>
+          <q-space class="col-6"></q-space>
+          <q-input
+            dense
+            v-model="user.email"
+            label="email"
+            class="q-mb-sm"
+            size="sm"
+          >
+          </q-input>
+        </template>
+        <template v-else v-slot:top-right>
           <q-btn
             color="gray"
             size="md"
@@ -85,7 +105,7 @@
             unelevated
             label="Add"
             class="align-self-center"
-            @click="users.push({ name: 'User', email: 'example@gos.com' })"
+            @click="toggleNewUser = !toggleNewUser"
           >
             <template v-slot:default>
               <q-icon class="q-mx-sm" name="add" />
@@ -138,11 +158,13 @@ export default {
   setup() {
     const { topics } = storeToRefs(useTopicsStore());
     const users = ref([]);
+    const user = ref({ name: "", email: "" });
     const title = ref("");
     const topic = ref("");
     const file = ref(null);
     const send = ref(true);
     const newTopic = ref(false);
+    const toggleNewUser = ref(false);
     const { createNewsletter } = useNewslettersStore();
     const { createUsers } = useUsersStore();
     const { createTopic } = useTopicsStore();
@@ -172,10 +194,12 @@ export default {
       topic,
       file,
       send,
+      user,
       newTopic,
       createNewsletter,
       createUsers,
       createTopic,
+      toggleNewUser,
     };
   },
   methods: {
@@ -217,6 +241,10 @@ export default {
 
 .table {
   min-width: 400px;
+}
+
+.q-table__top {
+  padding: 0;
 }
 
 /*table min width 320 on mobile*/
