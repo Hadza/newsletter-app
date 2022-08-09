@@ -17,7 +17,7 @@ router.get("/count", users.count);
 router.post("/:id/subscriptions", users.createSubscription);
 
 /* DELETE subscription. */
-router.delete("/:id/subscriptions", users.deleteSubscription);
+router.delete("/:user/:topic", users.deleteSubscription);
 
 /* POST user. */
 router.post("/", users.create);

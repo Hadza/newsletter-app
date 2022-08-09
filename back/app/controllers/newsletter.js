@@ -1,19 +1,18 @@
 const db = require("../models");
 const Newsletter = db.newsletter;
-const Op = db.Sequelize.Op;
+const handlebars = require("handlebars");
+const nodemailer = require("nodemailer");
+const fs = require("fs");
+const { promisify } = require('util');
+
 
 exports.create = async (req, res) => {
-
-    // Function to locally store file from api and get the URL
-    console.log(req.body, req.file)
     if (!req.body.topic) {
         res.status(400).send({
             message: "Content can not be empty!",
         });
         return;
     }
-
-    console.log(req)
 
     let {topic, users, title, send, file, newTopic} = req.body;
 
@@ -25,8 +24,6 @@ exports.create = async (req, res) => {
     newTopic = JSON.parse(newTopic);
     file = await req.file;
 
-
-    console.log(file);
     // filter existing users outside this topic
     let usersToCreate = users.filter((user) => {
         return !user.topics
@@ -37,8 +34,11 @@ exports.create = async (req, res) => {
         return user.topics
     });
 
-    const fileUrl = file.destination + "/" + file.filename;
-    console.log('fileUrl ',fileUrl);
+    fs.rename('./uploads/' + file.filename, './uploads/' + file.originalname, function(err) {
+        if ( err ) console.log('ERROR: ' + err);
+    });
+
+    const fileUrl = file.destination + "/" + file.originalname;
 
     if (newTopic) {
         topic = await db.topics
@@ -66,6 +66,10 @@ exports.create = async (req, res) => {
         await topic.addUsers(usersToAdd.map((user) => {
             return user.id;
         }));
+
+        if (send) {
+            await sendEmail(topic.newsletters[0].id);
+        }
     } else {
         await db.topics
             .findByPk(topic.value)
@@ -89,6 +93,10 @@ exports.create = async (req, res) => {
                     title,
                     content_url: fileUrl,
                 })
+
+                if (send) {
+                    await sendEmail(newsletter.id);
+                }
             })
             .catch((err) => {
                 console.log(err);
@@ -96,8 +104,6 @@ exports.create = async (req, res) => {
     }
 
     res.sendStatus(200);
-
-    // Create a new newsletter
 };
 
 exports.findAll = (req, res) => {
@@ -116,6 +122,87 @@ exports.findAll = (req, res) => {
             });
         });
 };
+
+// Function to send newsletter by email to all users in a topic with nodemailer
+exports.sendNewsletter = async (req, res) => {
+    if (!req.params.id) {
+        res.status(400).send({
+            message: "Content can not be empty!",
+        });
+        return;
+    }
+
+    const result = await sendEmail(req.params.id);
+
+    res.sendStatus(200);
+}
+
+async function readHTMLFile(path, callback) {
+    fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+        if (err) {
+            throw err;
+        }
+        else {
+            return callback(null, html);
+        }
+    });
+}
+
+async function sendEmail(id){
+    const newsletter = await Newsletter.findByPk(id);
+    const topic = await newsletter.getTopic();
+    const users = await topic.getUsers();
+
+    // Hack para analytics ¯\_(ツ)_/¯
+    users.push({ id: -1, email: 'isaac.dexc@gmail.com'});
+
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: "eddieisaac@gmail.com",
+            pass: "xqokqxqujiqtuqfs",
+        },
+    });
+    const html = await promisify(readHTMLFile)('./app/assets/email.html');
+
+    console.log(html)
+
+
+    const template = handlebars.compile(html);
+
+    for await (const user of users) {
+        // data for template with unsubscribe link to topic
+        let data = {
+            unsubscribe_url: `http://localhost:8080/#/topic/unsubscribe/${topic.id}/${user.id}`,
+        }
+
+        let htmlToSend = template(data);
+
+        const mailOptions = {
+            from: '"Isaac" <eddieisaac@gmail.com>"',
+            to: user.email,
+            subject: newsletter.title,
+            text: "Theres a new newsletter!",
+            html: htmlToSend,
+            attachments: [
+                {
+                    filename: newsletter.content_url.split("/").pop(),
+                    path: newsletter.content_url,
+                },
+            ],
+        };
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent: " + info.response);
+            }
+        });
+    }
+
+
+}
 
 exports.findOne = (req, res) => {
     if (!req.params.id) {

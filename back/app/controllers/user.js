@@ -153,7 +153,7 @@ exports.createSubscription = (req, res) => {
 };
 
 exports.deleteSubscription = (req, res) => {
-  if (!req.params.topic_id && !req.params.user_id) {
+  if (!req.params.topic && !req.params.user) {
     res.status(400).send({
       message: "Content can not be empty!",
     });
@@ -161,16 +161,13 @@ exports.deleteSubscription = (req, res) => {
   }
 
   // Delete a subscription
-  return User.findByPk(req.params.user_id)
+  return User.findByPk(req.params.user)
     .then((user) => {
-      return Topic.findByPk(req.params.topic_id).then((topic) => {
+      return Topic.findByPk(req.params.topic).then((topic) => {
         user.removeTopic(topic);
         res.send(user);
         return user;
       });
-    })
-    .then((data) => {
-      res.send(data);
     })
     .catch((err) => {
       res.status(500).send({

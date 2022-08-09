@@ -32,6 +32,10 @@ class UsersService {
   createSubscription(id, subscription) {
     return http.post(`/users/${id}/subscriptions`, subscription);
   }
+
+  deleteSubscription(user, topic) {
+    return http.delete(`/users/${user}/${topic}`);
+  }
 }
 
 export default new UsersService();
