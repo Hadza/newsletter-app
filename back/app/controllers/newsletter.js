@@ -201,6 +201,16 @@ async function sendEmail(id){
         });
     }
 
+    // update status to sent
+    db.newsletter.update({
+        status: 'sent',
+    },{
+        where: {
+            id: id,
+        }
+    });
+
+
 
 }
 

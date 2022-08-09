@@ -21,6 +21,11 @@ class NewslettersService {
     return http.get("/newsletters/count");
   }
 
+  // send newsletter
+  sendNewsletter(id) {
+    return http.post(`/newsletters/send/${id}`);
+  }
+
   create(newsletter) {
     // Create form data with all newsletter fields and files stringified
     const formData = new FormData();

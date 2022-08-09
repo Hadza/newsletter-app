@@ -204,8 +204,6 @@ export default {
       const { title, topic, file, users, send, newTopic, tempFile } = this;
       const { createNewsletter, createTopic } = this;
 
-      const filed = file.length > 0 ? file[0] : null;
-
       createNewsletter({
         title,
         topic,

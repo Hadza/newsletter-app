@@ -17,6 +17,19 @@
           </template>
         </q-btn>
       </template>
+      <template v-slot:body-cell-action="props">
+        <q-td :props="props">
+          <q-btn
+            v-if="props.row.status !== 'sent'"
+            color="positive"
+            icon-right="send"
+            no-caps
+            flat
+            dense
+            @click="sendEmail(props.row)"
+          />
+        </q-td>
+      </template>
     </q-table>
   </q-card-section>
 </template>
@@ -25,10 +38,13 @@
 import { useNewslettersStore } from "@/stores/NewslettersStore";
 import { date } from "quasar";
 import { storeToRefs } from "pinia/dist/pinia";
+import NewslettersService from "@/services/NewslettersService";
+import { useQuasar } from "quasar";
 
 export default {
   name: "DashboardTable",
   setup() {
+    const $q = useQuasar();
     const columns = [
       {
         name: "id",
@@ -52,6 +68,13 @@ export default {
         width: "200px",
       },
       {
+        name: "status",
+        field: "status",
+        label: "Status",
+        align: "left",
+        width: "200px",
+      },
+      {
         name: "created_at",
         field: "createdAt",
         label: "Created At",
@@ -61,6 +84,7 @@ export default {
           return date.formatDate(value, "DD-MM-YY HH:mm");
         },
       },
+      { name: "action", label: "Action", field: "action" },
     ];
     const { newsletters } = storeToRefs(useNewslettersStore());
 
@@ -68,11 +92,31 @@ export default {
       totalUsers: 15,
       newsletters,
       columns,
+      $q,
     };
   },
   methods: {
     addRecord() {
       this.$emit("changeView");
+    },
+    sendEmail(row) {
+      const { getAll } = useNewslettersStore();
+      NewslettersService.sendNewsletter(row.id)
+        .then(() => {
+          this.$q.notify({
+            type: "positive",
+            message: "Newsletter sent successfully",
+          });
+        })
+        .then(() => {
+          getAll();
+        })
+        .catch((err) => {
+          this.$q.notify({
+            type: "negative",
+            message: err.message,
+          });
+        });
     },
   },
 };

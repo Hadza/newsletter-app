@@ -27,6 +27,9 @@ router.get("/:id",newsletters.findOne);
 /* POST newsletter. */
 router.post("/", upload, newsletters.create);
 
+/* POST send newsletter. */
+router.post("/send/:id", newsletters.sendNewsletter);
+
 /* DELETE newsletter. */
 router.delete("/:id", newsletters.delete);
 
