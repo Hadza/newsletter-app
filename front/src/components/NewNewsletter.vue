@@ -41,8 +41,9 @@
         label="File"
         counter
         max-files="1"
-        accept=".png, image/*, .pdf"
+        accept=".png, .pdf, image/*"
         class="q-my-lg"
+        @update:model-value="readFile"
       >
         <template v-slot:prepend>
           <q-icon name="folder_open" />
@@ -153,6 +154,7 @@ export default {
     const title = ref("");
     const topic = ref("");
     const file = ref(null);
+    const tempFile = ref({});
     const send = ref(true);
     const newTopic = ref(false);
     const toggleNewUser = ref(false);
@@ -185,6 +187,7 @@ export default {
       title,
       topic,
       file,
+      tempFile,
       send,
       user,
       newTopic,
@@ -198,8 +201,10 @@ export default {
   },
   methods: {
     saveNewsletter() {
-      const { title, topic, file, users, send, newTopic } = this;
+      const { title, topic, file, users, send, newTopic, tempFile } = this;
       const { createNewsletter, createTopic } = this;
+
+      const filed = file.length > 0 ? file[0] : null;
 
       createNewsletter({
         title,
@@ -213,6 +218,16 @@ export default {
     toggleNewTopic() {
       this.topic = "";
       this.newTopic = !this.newTopic;
+    },
+    async readFile() {
+      console.log("entra");
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log(e);
+        this.tempFileStream = e.target.result;
+      };
+      const result = reader.readAsDataURL(this.file);
+      return result;
     },
     changeTopic() {
       const { topic } = this;
@@ -244,7 +259,7 @@ export default {
         }
       });
       // clean email list
-      emailList = "";
+      this.emailList = "";
     },
     deleteItem(index) {
       let { users } = this;

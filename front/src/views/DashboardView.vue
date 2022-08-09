@@ -65,7 +65,7 @@ export default defineComponent({
 
 <style>
 .q-table__top {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 </style>

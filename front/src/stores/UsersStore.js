@@ -8,6 +8,8 @@ export const useUsersStore = defineStore("users", {
   getters: {
     getUsersCount: (state) => state.users.length,
     getUsersByTopic: (state) => (topic_id) => {
+      // Find all users by topic id and filter by active subscription
+
       return state.users.filter((user) => {
         return user.topics.some((topic) => {
           return topic.id === topic_id;

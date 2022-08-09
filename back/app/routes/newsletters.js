@@ -1,6 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const newsletters = require("../controllers/newsletter.js");
+const multer = require("multer");
+const storage =   multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, './uploads');
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.fieldname + '-' + Date.now());
+    }
+});
+const upload = multer({ storage : storage}).single('file');
 
 /* GET newsletters listing. */
 router.get("/", newsletters.findAll);
@@ -12,10 +22,10 @@ router.get("/topic/:id", newsletters.findAllByTopic);
 router.get("/published", newsletters.findAllPublished);
 
 /* GET newsletter by id. */
-router.get("/:id", newsletters.findOne);
+router.get("/:id",newsletters.findOne);
 
 /* POST newsletter. */
-router.post("/", newsletters.create);
+router.post("/", upload, newsletters.create);
 
 /* DELETE newsletter. */
 router.delete("/:id", newsletters.delete);

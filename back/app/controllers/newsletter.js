@@ -3,6 +3,9 @@ const Newsletter = db.newsletter;
 const Op = db.Sequelize.Op;
 
 exports.create = async (req, res) => {
+
+    // Function to locally store file from api and get the URL
+    console.log(req.body, req.file)
     if (!req.body.topic) {
         res.status(400).send({
             message: "Content can not be empty!",
@@ -10,10 +13,20 @@ exports.create = async (req, res) => {
         return;
     }
 
-    let {content, topic, status, users, title, send, file, newTopic} = req.body;
-    let newTopicData = {};
+    console.log(req)
 
-    console.log(users);
+    let {topic, users, title, send, file, newTopic} = req.body;
+
+    // parse all body fields
+
+    topic = JSON.parse(topic);
+    users = JSON.parse(users);
+    send = JSON.parse(send);
+    newTopic = JSON.parse(newTopic);
+    file = await req.file;
+
+
+    console.log(file);
     // filter existing users outside this topic
     let usersToCreate = users.filter((user) => {
         return !user.topics
@@ -24,6 +37,9 @@ exports.create = async (req, res) => {
         return user.topics
     });
 
+    const fileUrl = file.destination + "/" + file.filename;
+    console.log('fileUrl ',fileUrl);
+
     if (newTopic) {
         topic = await db.topics
             .create(
@@ -33,8 +49,7 @@ exports.create = async (req, res) => {
                     newsletters: [
                         {
                             title,
-                            content_url: "",
-                            status,
+                            content_url: fileUrl,
                         },
                     ],
                 },
@@ -72,8 +87,7 @@ exports.create = async (req, res) => {
 
                 const newsletter = await topic.createNewsletter({
                     title,
-                    content_url: "",
-                    status,
+                    content_url: fileUrl,
                 })
             })
             .catch((err) => {
@@ -93,7 +107,6 @@ exports.findAll = (req, res) => {
         include: "topic",
     })
         .then((data) => {
-            console.log(data);
             res.send(data);
         })
         .catch((err) => {

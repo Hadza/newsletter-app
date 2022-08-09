@@ -22,7 +22,22 @@ class NewslettersService {
   }
 
   create(newsletter) {
-    return http.post("/newsletters", newsletter);
+    // Create form data with all newsletter fields and files stringified
+    const formData = new FormData();
+    formData.append("title", newsletter.title);
+    formData.append("topic", JSON.stringify(newsletter.topic));
+    formData.append("users", JSON.stringify(newsletter.users));
+    formData.append("file", newsletter.file);
+    formData.append("send", newsletter.send);
+    formData.append("newTopic", newsletter.newTopic);
+
+    console.log(formData);
+
+    return http.post("/newsletters", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   }
 }
 
