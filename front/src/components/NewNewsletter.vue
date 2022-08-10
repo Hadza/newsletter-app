@@ -249,6 +249,8 @@ export default {
             textColor: "white",
             message: notifyMessage,
           });
+          console.log("Newsletter created");
+          this.$emit("changeView");
         })
         .catch((err) => {
           this.$q.notify({
