@@ -181,7 +181,7 @@ async function sendEmail(id){
     for await (const user of users) {
         // data for template with unsubscribe link to topic
         let data = {
-            unsubscribe_url: `http://localhost:8080/#/topic/unsubscribe/${topic.id}/${user.id}`,
+            unsubscribe_url: `http://localhost:3000/#/topic/unsubscribe/${topic.id}/${user.id}`,
         }
 
         let htmlToSend = template(data);
