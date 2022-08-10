@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
     // filter existing users outside this topic
     console.log(users);
     let usersToCreate = users.filter((user) => {
-        return !user.topics
+        return !user.id
     });
     console.log("usersToCreate", usersToCreate);
 
