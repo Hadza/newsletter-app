@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  backend:
+    container_name: backend
+    image: newsletter-image
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    environment:
+      - EXTERNAL_PORT=3000
+      - PGUSER=postgres
+      - PGPASSWORD=docker
+      - PGDATABASE=newsletter
+      - PGHOST=db # NAME OF THE SERVICE
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: postgres:14.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=newsletter
+    volumes:
+      - data:/var/lib/postgresql/data
+volumes:
+  data: {}

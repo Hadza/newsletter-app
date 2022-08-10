@@ -15,9 +15,9 @@ const corsOptions = {
   origin: "http://localhost:8080",
 };
 
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log("Drop and re-sync db.");
-// });
+db.sequelize.sync().then(() => {
+  console.log("Drop and re-sync db.");
+});
 
 app.use(cors(corsOptions));
 app.use(logger("dev"));

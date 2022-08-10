@@ -16,17 +16,29 @@ You can perform the following actions:
 * Nodemailer w/ Handlebars
 * PostgreSQL
 
+# Installation
+1. Download the latest version of the app from this repository.
+
+2. Create Docker image.
+```bash
+ docker build -t newsletter-image .
+```
+
+3. Build container with Docker compose
+```bash
+ docker-compose build
+```
+
+4. Run the container
+```bash
+ docker-compose up -d backend
+```
+
+5. Open the browser and go to http://localhost:3000
+
 ## Preview
 ![](images/home.png)
 ![](images/new.png)
 ![](images/email.jpg)
 
-
-# Installation
-## Backend
-Change
-
-```bash
-npm install
-```
 

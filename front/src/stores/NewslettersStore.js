@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import NewslettersService from "@/services/NewslettersService";
-import { useQuasar } from "quasar";
 
 export const useNewslettersStore = defineStore("newsletters", {
   state: () => ({

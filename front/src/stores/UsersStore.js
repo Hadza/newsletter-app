@@ -30,7 +30,7 @@ export const useUsersStore = defineStore("users", {
     // create user
     createUser(user) {
       return UsersService.create(user)
-        .then((data) => {
+        .then(() => {
           this.getAll();
         })
         .catch((err) => {
@@ -40,7 +40,7 @@ export const useUsersStore = defineStore("users", {
     // create users by bulk
     createUsers(users) {
       return UsersService.createUsers(users)
-        .then((data) => {
+        .then(() => {
           this.getAll();
         })
         .catch((err) => {

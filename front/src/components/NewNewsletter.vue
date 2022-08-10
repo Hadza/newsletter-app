@@ -228,8 +228,7 @@ export default {
   },
   methods: {
     saveNewsletter() {
-      const { title, topic, file, users, send, newTopic, tempFile } = this;
-      const { createNewsletter, createTopic } = this;
+      const { title, topic, file, users, send, newTopic } = this;
       const notifyMessage =
         send && users.length ? "Newsletter sent" : "Newsletter created";
 
