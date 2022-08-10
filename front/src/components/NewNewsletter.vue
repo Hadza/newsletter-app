@@ -1,8 +1,25 @@
 <template>
   <q-card-section>
     <q-card-section>
-      <div class="text-h6 text-weight-regular">New topic</div>
-      <q-input v-model="title" label="Title" class="q-mb-lg" />
+      <div class="text-h6 text-weight-regular">
+        <!--        button to go back-->
+        <q-btn
+          color="primary"
+          icon-right="arrow_back"
+          no-caps
+          dense
+          flat
+          @click="$emit('change-view')"
+        />
+        New topic
+      </div>
+      <q-input
+        v-model="title"
+        label="Title"
+        class="q-mb-lg"
+        hint="Enter a title for the newsletter"
+        :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+      />
       <template v-if="!newTopic">
         <q-select
           v-model="topic"
@@ -10,6 +27,8 @@
           :options="options"
           label="Topic"
           class="q-mb-sm"
+          hint="Select a topic"
+          :rules="[(val) => val || 'Please select a topic']"
         >
           <template v-slot:after>
             <q-btn round dense flat icon="add" @click="toggleNewTopic" />
@@ -17,7 +36,12 @@
         </q-select>
       </template>
       <template v-else>
-        <q-input v-model="topic" label="Topic" class="q-my-lg">
+        <q-input
+          v-model="topic"
+          label="Topic"
+          class="q-my-lg"
+          :rules="[(val) => (val && val.length > 0) || 'Please type something']"
+        >
           <template v-slot:after>
             <q-btn
               color="white"
@@ -44,6 +68,7 @@
         accept=".png, .pdf, image/*"
         class="q-my-lg"
         @update:model-value="readFile"
+        :rules="[(val) => val || 'Please select a file']"
       >
         <template v-slot:prepend>
           <q-icon name="folder_open" />
@@ -118,7 +143,7 @@
         unelevated
         label="Cancel"
         class="align-self-center"
-        @click="true"
+        @click="$emit('changeView')"
       >
       </q-btn>
       <q-btn
@@ -129,6 +154,7 @@
         outline
         label="Save newsletter"
         class="align-self-center"
+        :disable="disabled"
         @click="saveNewsletter"
       >
       </q-btn>
@@ -143,6 +169,7 @@ import { useTopicsStore } from "@/stores/TopicsStore";
 import { useNewslettersStore } from "@/stores/NewslettersStore";
 import { ref } from "vue";
 import UsersService from "@/services/UsersService";
+import NewslettersService from "@/services/NewslettersService";
 
 export default {
   name: "NewNewsletter",
@@ -158,7 +185,7 @@ export default {
     const send = ref(true);
     const newTopic = ref(false);
     const toggleNewUser = ref(false);
-    const { createNewsletter } = useNewslettersStore();
+    const { getAll } = useNewslettersStore();
     const { createUsers, getUsersByTopic } = useUsersStore();
     const { createTopic } = useTopicsStore();
 
@@ -191,27 +218,46 @@ export default {
       send,
       user,
       newTopic,
-      createNewsletter,
       createUsers,
       createTopic,
       toggleNewUser,
       getUsersByTopic,
       emailList,
+      getAll,
     };
   },
   methods: {
     saveNewsletter() {
       const { title, topic, file, users, send, newTopic, tempFile } = this;
       const { createNewsletter, createTopic } = this;
+      const notifyMessage =
+        send && users.length ? "Newsletter sent" : "Newsletter created";
 
-      createNewsletter({
+      console.log(users);
+
+      NewslettersService.create({
         title,
         topic,
         file,
         users,
         send,
         newTopic,
-      });
+      })
+        .then(() => {
+          this.getAll();
+          this.$q.notify({
+            color: "positive",
+            textColor: "white",
+            message: notifyMessage,
+          });
+        })
+        .catch((err) => {
+          this.$q.notify({
+            color: "negative",
+            textColor: "white",
+            message: err.message,
+          });
+        });
     },
     toggleNewTopic() {
       this.topic = "";
@@ -237,7 +283,6 @@ export default {
       let { emailList, users } = this;
       //   split list of emails, compare to email regex and add to users array
       const emails = emailList.replace(/ /g, "").split(",");
-      console.log(emails);
       emails.forEach((email) => {
         if (email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
           let isInArray = false;
@@ -273,6 +318,17 @@ export default {
         };
       });
     },
+    disabled() {
+      return (
+        !this.title || !this.topic || !this.file || !this.users.length >= 1
+      );
+    },
+  },
+  mounted() {
+    // if topics is empty, toggle new topic
+    if (this.topics.length === 0) {
+      this.toggleNewTopic();
+    }
   },
 };
 </script>

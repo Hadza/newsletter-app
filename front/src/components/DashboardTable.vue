@@ -20,14 +20,22 @@
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
           <q-btn
-            v-if="props.row.status !== 'sent'"
-            color="positive"
-            icon-right="send"
+            color="grey"
+            :icon-right="props.row.status === 'sent' ? 'replay' : 'send'"
             no-caps
             flat
             dense
             @click="sendEmail(props.row)"
           />
+        </q-td>
+      </template>
+      <template v-slot:body-cell-status="props">
+        <q-td :props="props">
+          <span
+            :class="props.row.status === 'sent' ? 'text-green' : 'text-orange'"
+          >
+            {{ props.row.status }}
+          </span>
         </q-td>
       </template>
     </q-table>
@@ -73,6 +81,9 @@ export default {
         label: "Status",
         align: "left",
         width: "200px",
+        format: (value) => {
+          return value === "sent" ? "Sent" : "Draft";
+        },
       },
       {
         name: "created_at",

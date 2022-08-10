@@ -1,5 +1,5 @@
 <template>
-  <q-card-section>
+  <q-card-section class="q-px-none">
     <q-card-section>
       <div class="text-h6">Summary</div>
     </q-card-section>

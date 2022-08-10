@@ -14,9 +14,12 @@ exports.create = async (req, res) => {
         return;
     }
 
+    console.log(req.body)
+
     let {topic, users, title, send, file, newTopic} = req.body;
 
     // parse all body fields
+    console.log(users)
 
     topic = JSON.parse(topic);
     users = JSON.parse(users);
@@ -25,14 +28,17 @@ exports.create = async (req, res) => {
     file = await req.file;
 
     // filter existing users outside this topic
+    console.log(users);
     let usersToCreate = users.filter((user) => {
         return !user.topics
     });
+    console.log("usersToCreate", usersToCreate);
 
     // users to add to this topic
     let usersToAdd = users.filter((user) => {
         return user.topics
     });
+    console.log("usersToAdd", usersToAdd);
 
     fs.rename('./uploads/' + file.filename, './uploads/' + file.originalname, function(err) {
         if ( err ) console.log('ERROR: ' + err);
@@ -63,6 +69,8 @@ exports.create = async (req, res) => {
             .catch((err) => {
                 console.log(err);
             });
+        console.log(topic);
+        console.log(usersToAdd);
         await topic.addUsers(usersToAdd.map((user) => {
             return user.id;
         }));

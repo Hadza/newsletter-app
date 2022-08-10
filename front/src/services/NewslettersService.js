@@ -28,15 +28,20 @@ class NewslettersService {
 
   create(newsletter) {
     // Create form data with all newsletter fields and files stringified
+    console.log(JSON.stringify(newsletter.users));
     const formData = new FormData();
     formData.append("title", newsletter.title);
     formData.append("topic", JSON.stringify(newsletter.topic));
-    formData.append("users", JSON.stringify(newsletter.users));
+    formData.append(
+      "users",
+      JSON.stringify(newsletter.users, ["id", "email", "topics"])
+    );
     formData.append("file", newsletter.file);
     formData.append("send", newsletter.send);
     formData.append("newTopic", newsletter.newTopic);
 
     console.log(formData);
+    console.log(newsletter.users);
 
     return http.post("/newsletters", formData, {
       headers: {
