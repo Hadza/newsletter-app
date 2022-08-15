@@ -19,19 +19,9 @@ You can perform the following actions:
 # Installation
 1. Download the latest version of the app from this repository.
 
-2. Create Docker image.
+2. Build and run the Docker container
 ```bash
- docker build -t newsletter-image .
-```
-
-3. Build container with Docker compose
-```bash
- docker-compose build
-```
-
-4. Run the container
-```bash
- docker-compose up -d backend
+ docker-compose up
 ```
 
 5. Open the browser and go to http://localhost:3000
